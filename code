@@ -1,0 +1,45 @@
+import os
+import requests
+
+path = "your path" 
+exefile = 'hwp5txt'
+inName = input('입력 파일명을 입력하세요 (txt) :')
+openName = path + inName
+sourceLan = input('번역시킬 언어를 입력하세요 :')
+targetLan=input('번역되어 나올 언어를 입력하세요 :')
+outName=input('츌력 파일명을 입력하세요 (txt) :')
+
+res = []
+for root, dirs, files in os.walk(path):
+    rootpath = os.path.join(os.path.abspath(path), root)
+    for file in files:
+        filepath = os.path.join(rootpath, file)
+        res.append(filepath) 
+
+    for result in res:
+        filename = result[:-4]+ ".txt"
+        output = '--output ' + '"' + filename + '"'
+        result = '"' + result + '"'
+        print(exefile + " " + output + " " + result)
+        os.system(exefile + " " + output + " " + result)
+
+client_id = "your ID"
+client_secret = "your P/W"
+url = "https://openapi.naver.com/v1/papago/n2mt"
+
+f = open(openName, encoding = 'utf-8')
+data = f.read()
+f_result = open(path+outName,'w')
+headers = {"X-Naver-Client-Id":client_id, "X-Naver-Client-Secret":client_secret}
+params = {"source":sourceLan, "target":targetLan, "text":data}
+
+try:
+    response = requests.post(url, headers = headers, data = params)
+    result = response.json()
+    f_result.write(result['message']['result']['translatedText'])
+    print(result['message']['result']['translatedText'])
+
+except Exception as e:
+    print(e)
+f.close()
+f_result.close()
